@@ -1,0 +1,17 @@
+name = "SummarizedExperiments"
+uuid = "b04b66ec-f619-4ebf-810e-cf5ccc546695"
+authors = ["LTLA <infinite.monkeys.with.keyboards@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
