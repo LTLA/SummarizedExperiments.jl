@@ -55,3 +55,11 @@ function setassays(x::SummarizedExperiment, value::DataStructures.OrderedDict{Ab
     x.assays = value
     return x
 end
+
+function metadata(x::SummarizedExperiment)
+    return x.metadata;
+end
+
+function setmetadata(x::SummarizedExperiment, value::Dict{String,Any})
+    x.metadata = value;
+end
