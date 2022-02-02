@@ -1,17 +1,17 @@
-export size, rowdata, setrowdata, coldata, setcoldata, assay, setassay, assays, setassays
+export size, rowdata, setrowdata, coldata, setcoldata, assay, setassay, assays, setassays, metadata, setmetadata
 import DataFrames
 import DataStructures
 
 function Base.size(x::SummarizedExperiment)
-    return Int64[size(row_data), size(column_data)]
+    return (size(x.rowdata)[1], size(x.coldata)[1])
 end
 
 function rowdata(x::SummarizedExperiment)
-    return rowdata
+    return x.rowdata
 end
 
 function setrowdata(x::SummarizedExperiment, value::DataFrames.DataFrame)
-    if value.size()[1] != x.rowdata.size()[1]
+    if size(value)[1] != size(x.rowdata)[1]
         throw(DimensionMismatch("'value' and 'rowdata(x)' should have the same number of rows"))
     end
     x.rowdata = value
@@ -19,11 +19,11 @@ function setrowdata(x::SummarizedExperiment, value::DataFrames.DataFrame)
 end 
 
 function coldata(x::SummarizedExperiment)
-    return coldata
+    return x.coldata
 end
 
 function setcoldata(x::SummarizedExperiment, value::DataFrames.DataFrame)
-    if value.size()[1] != x.coldata.size()[1]
+    if size(value)[1] != size(x.coldata)[1]
         throw(DimensionMismatch("'value' and 'coldata(x)' should have the same number of rows"))
     end
     x.coldata = value
