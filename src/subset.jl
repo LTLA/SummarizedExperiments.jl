@@ -1,3 +1,5 @@
+import DataStructures
+
 function Base.getindex(x::SummarizedExperiment, indices...)
     if length(indices) != 2
         throw(DimensionMismatch("exactly two indices are required for SummarizedExperiment indexing"))
@@ -17,7 +19,7 @@ function Base.getindex(x::SummarizedExperiment, indices...)
     end
     new_coldata = x.coldata[index_cols,:]
 
-    new_assays = OrderedDict{String,AbstractArray}();
+    new_assays = DataStructures.OrderedDict{String,AbstractArray}();
     for (key, val) in x.assays
         new_assays[key] = val[index_rows,index_cols]
     end
