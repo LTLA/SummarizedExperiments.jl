@@ -36,6 +36,36 @@ function collapse_data(x::Vector{Dict{String,Any}})
     return base
 end
 
+"""
+    vcat(A::Vararg{SummarizedExperiment})
+
+Vertically concatenate one or more `SummarizedExperiment` objects.
+The input objects must satisfy the following constraints:
+
+- All objects must have the same number of columns, which are assumed to be in the same order.
+- All objects must have `DataFrame`s in their `rowdata` with the same type and names of all columns (though they may be ordered differently).
+- All objects must have the same names and types of assays;
+  for a given assay name, the dimensions of the corresponding arrays across all `A` should be the same except for the first dimension. 
+
+This function returns a single `SummarizedExperiment` instance where the number of rows is equal to the sum of the number of rows across all objects in `A`.
+The number of columns in the output object is the same as the number of columns in any object in `A`.
+The order of columns in the output `rowdata` is the same as that of the first object.
+The output `coldata` is created by combining columns horizontally across `coldata` of all objects in `A`;
+if columns have duplicate names, only the first instance of each column is retained.
+
+```jldoclist
+julia> x = exampleobject(20, 10);
+
+julia> y = exampleobject(30, 10);
+
+julia> z = vcat(x, y)
+50x10 SummarizedExperiment
+  assays(3): foo bar whee
+  rowdata(2): ID Type
+  coldata(3): ID Treatment Response
+  metadata(1): version
+```
+"""
 function Base.vcat(A::Vararg{SummarizedExperiment})
     if length(A) < 2
         return A[1] # no-op in this case.
@@ -79,6 +109,36 @@ function Base.vcat(A::Vararg{SummarizedExperiment})
     return SummarizedExperiment(full_assays, full_rowdata, full_coldata, full_metadata)
 end
 
+"""
+    hcat(A::Vararg{SummarizedExperiment})
+
+Horizontally concatenate one or more `SummarizedExperiment` objects.
+The input objects must satisfy the following constraints:
+
+- All objects must have the same number of rows, which are assumed to be in the same order.
+- All objects must have `DataFrame`s in their `coldata` with the same type and names of all columns (though they may be ordered differently).
+- All objects must have the same names and types of assays;
+  for a given assay name, the dimensions of the corresponding arrays across all `A` should be the same except for the second dimension. 
+
+This function returns a single `SummarizedExperiment` instance where the number of columns is equal to the sum of the number of columns across all objects in `A`.
+The number of rows in the output object is the same as the number of rows in any object in `A`.
+The order of columns in the output `coldata` is the same as that of the first object.
+The output `rowdata` is created by combining columns horizontally across `rowdata` of all objects in `A`;
+if columns have duplicate names, only the first instance of each column is retained.
+
+```jldoclist
+julia> x = exampleobject(20, 20);
+
+julia> y = exampleobject(20, 30);
+
+julia> z = hcat(x, y)
+20x50 SummarizedExperiment
+  assays(3): foo bar whee
+  rowdata(2): ID Type
+  coldata(3): ID Treatment Response
+  metadata(1): version
+```
+"""
 function Base.hcat(A::Vararg{SummarizedExperiment})
     if length(A) < 2
         return A[1] # no-op in this case.
