@@ -7,7 +7,10 @@ import DataStructures
 
 Return a 2-tuple containing the number of rows and columns in `x`.
 
+# Examples
 ```jldoctest
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 10);
 
 julia> size(x)
@@ -24,7 +27,10 @@ end
 Return the row annotations as a `DataFrame` with number of rows equal to the number of rows in `x`.
 If no annotations are present, an empty `DataFrame` is returned instead.
 
+# Examples
 ```jldoctest
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 10);
 
 julia> names(rowdata(x))
@@ -47,6 +53,10 @@ Set the row annotations in `x` to `value`.
 This can either be an empty `DataFrame` (i.e., no row annotations)
 or a `DataFrame` with number of rows equal to the number of rows in `x`.
 
+# Examples
+```jldoctest
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 10);
 
 julia> using DataFrames
@@ -58,6 +68,7 @@ julia> setrowdata!(x, replacement)
 julia> names(rowdata(x))
 1-element Array{String,1}:
  "stuff"
+```
 """    
 function setrowdata!(x::SummarizedExperiment, value::DataFrames.DataFrame)
     if size(value)[2] > 0 && size(value)[1] != x.nrow
@@ -73,7 +84,10 @@ end
 Return the column annotations as a `DataFrame` with number of rows equal to the number of columns in `x`.
 If no annotations are present, an empty `DataFrame` is returned instead.
 
+# Examples
 ```jldoctest
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 10);
 
 julia> names(coldata(x))
@@ -82,7 +96,7 @@ julia> names(coldata(x))
  "Treatment"
  "Response"
 
-julia> size(rowdata(x))
+julia> size(coldata(x))
 (10, 3)
 ```
 """
@@ -97,7 +111,10 @@ Set the column annotations in `x` to `value`.
 This can either be an empty `DataFrame` (i.e., no column annotations)
 or a `DataFrame` with number of rows equal to the number of columns in `x`.
 
+# Examples
 ```jldoctest
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 10);
 
 julia> using DataFrames
@@ -126,8 +143,11 @@ Return the requested assay in `x`.
 `i` may be an integer specifying an index or a string containing the name.
 If `i` is not supplied, the first assay is returned.
 
-```jldoctest
-julia> x = exampleobject(20, 10)
+# Examples
+```jldoclist
+julia> using SummarizedExperiments
+
+julia> x = exampleobject(20, 10);
 
 # All of these give the same value.
 julia> assay(x);
@@ -169,20 +189,25 @@ The first two dimensions of `value` must have extent equal to those of `x`.
 or a string containing the name, in which case it may be an existing or new name.
 If `i` is not supplied, `value` is set to the first assay.
 
+# Examples
 ```jldoctest
-julia> x = exampleobject(20, 10)
+julia> using SummarizedExperiments
 
-julia> sum(assay(x))
+julia> x = exampleobject(20, 10);
 
-julia> sum(assay(x, 2))
+julia> first_sum = sum(assay(x));
 
-# Replacing the first assay with the second.
-julia> setassay!(x, assay(x, 2))
+julia> second_sum = sum(assay(x, 2));
 
-julia> sum(assay(x))
+julia> setassay!(x, assay(x, 2)); # Replacing the first assay with the second.
 
-# More explicit forms of the above.
-julia> setassay!(x, 1, assay(x, 2));
+julia> first_sum == sum(assay(x))
+false
+
+julia> second_sum == sum(assay(x))
+true
+
+julia> setassay!(x, 1, assay(x, 2)); # More explicit forms of the above.
 
 julia> setassay!(x, "foo", assay(x, 2));
 ```
@@ -224,8 +249,11 @@ end
 
 Return all assays from `x`.
 
+# Examples
 ```jldoctest
-julia> x = exampleobject(20, 10)
+julia> using SummarizedExperiments
+
+julia> x = exampleobject(20, 10);
 
 julia> collect(keys(assays(x)))
 3-element Array{String,1}:
@@ -244,8 +272,11 @@ end
 Set assays in `x` to `value`.
 All values in `value` should have the same extents for the first two dimensions.
 
+# Examples
 ```jldoctest
-julia> x = exampleobject(20, 10)
+julia> using SummarizedExperiments
+
+julia> x = exampleobject(20, 10);
 
 julia> length(assays(x))
 3
@@ -276,8 +307,11 @@ end
 
 Return all metadata from `x`.
 
+# Examples
 ```jldoctest
-julia> x = exampleobject(20, 10)
+julia> using SummarizedExperiments
+
+julia> x = exampleobject(20, 10);
 
 julia> metadata(x)
 Dict{String,Any} with 1 entry:
@@ -293,8 +327,11 @@ end
 
 Set metadata in `x` to `value`.
 
+# Examples
 ```jldoctest
-julia> x = exampleobject(20, 10)
+julia> using SummarizedExperiments
+
+julia> x = exampleobject(20, 10);
 
 julia> setmetadata!(x, Dict{String,Any}("foo" => 200));
 

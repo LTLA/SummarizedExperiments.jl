@@ -40,7 +40,10 @@ mutable struct SummarizedExperiment
 
     Create an instance of a `SummarizedExperiment` with the supplied assays and the (optional) row/column annotations.
 
+    # Examples
     ```jldoctest
+    julia> using SummarizedExperiments
+
     julia> using DataFrames, DataStructures
 
     julia> assays = OrderedDict{String, AbstractArray}(
@@ -49,9 +52,9 @@ mutable struct SummarizedExperiment
 
     julia> coldata = DataFrame(Treatment=["normal", "drug1", "drug2"]);
 
-    julia> x = SummarizedExperiments.SummarizedExperiment(assays, DataFrame(), coldata)
-    2x3 SummarizedExperiments.SummarizedExperiment
-      assays(3): foobar whee
+    julia> x = SummarizedExperiment(assays, DataFrame(), coldata)
+    2x3 SummarizedExperiment
+      assays(2): foobar whee
       rowdata(0):
       coldata(1): Treatment
       metadata(0):

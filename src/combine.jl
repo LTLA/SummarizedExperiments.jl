@@ -53,7 +53,10 @@ The order of columns in the output `rowdata` is the same as that of the first ob
 The output `coldata` is created by combining columns horizontally across `coldata` of all objects in `A`;
 if columns have duplicate names, only the first instance of each column is retained.
 
+# Examples
 ```jldoclist
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 10);
 
 julia> y = exampleobject(30, 10);
@@ -126,7 +129,10 @@ The order of columns in the output `coldata` is the same as that of the first ob
 The output `rowdata` is created by combining columns horizontally across `rowdata` of all objects in `A`;
 if columns have duplicate names, only the first instance of each column is retained.
 
+# Examples
 ```jldoclist
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 20);
 
 julia> y = exampleobject(20, 30);

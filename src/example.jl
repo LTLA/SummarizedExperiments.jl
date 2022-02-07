@@ -8,7 +8,10 @@ export exampleobject
 Create an example `SummarizedExperiment` object with the specified number of rows and columns.
 This is to be used to improve the succinctness of examples and tests.
 
+# Examples
 ```jldoctest
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 10)
 20x10 SummarizedExperiment
   assays(3): foo bar whee

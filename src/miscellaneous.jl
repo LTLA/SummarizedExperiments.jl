@@ -3,22 +3,23 @@
 
 Return a copy of `x`, where all components are identically-same as those in `x`.
 
-```jldoclist
-julia> x = exampleobject(20, 10)
+# Examples
+```jldoctest
+julia> using SummarizedExperiments, DataFrames
 
-julia> x2 = copy(x)
+julia> x = exampleobject(20, 10);
 
-julia> using DataFrames
+julia> x2 = copy(x);
 
-julia> setrowdata!(x2, DataFrame())
+julia> setrowdata!(x2, DataFrame());
 
-# Change to reference is only reflected in x2.
-julia> size(rowdata(x))
+julia> size(rowdata(x)) # Change to reference is only reflected in x2.
+(20, 2)
 
 julia> size(rowdata(x2))
+(0, 0)
 
-# Otherwise, the references point to the same object.
-julia> insertcols!(coldata(x), 1, "WHEE" => 1:10);
+julia> insertcols!(coldata(x), 1, "WHEE" => 1:10); # Otherwise, references point to the same object.
 
 julia> names(coldata(x2))
 4-element Array{String,1}:
@@ -46,20 +47,23 @@ end
 
 Return a deep copy of `x` and all of its components.
 
-```jldoclist
-julia> x = exampleobject(20, 10)
+# Examples
+```jldoctest
+julia> using SummarizedExperiments, DataFrames
 
-julia> x2 = deepcopy(x)
+julia> x = exampleobject(20, 10);
 
-julia> setrowdata!(x2, DataFrame())
+julia> x2 = deepcopy(x);
 
-# Change to reference is only reflected in x2.
-julia> size(rowdata(x))
+julia> setrowdata!(x2, DataFrame());
+
+julia> size(rowdata(x)) # Change to reference is only reflected in x2.
+(20, 2)
 
 julia> size(rowdata(x2))
+(0, 0)
 
-# References now point to different objects.
-julia> insertcols!(coldata(x), 1, "WHEE" => 1:10);
+julia> insertcols!(coldata(x), 1, "WHEE" => 1:10); # References now point to different objects.
 
 julia> names(coldata(x2))
 3-element Array{String,1}:

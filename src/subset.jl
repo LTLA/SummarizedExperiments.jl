@@ -14,7 +14,10 @@ Types for the arguments to `I` are similar to those for arrays:
   indicating whether each entry of that dimension should be retained.
 - A `:` operator to retain the entirety of a dimension's extent.
 
+# Examples
 ```jldoctest
+julia> using SummarizedExperiments
+
 julia> x = exampleobject(20, 10);
 
 julia> x[1,:]
