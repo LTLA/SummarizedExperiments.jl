@@ -1,19 +1,84 @@
+"""
+    copy(x::SummarizedExperiment)
+
+Return a copy of `x`, where all components are identically-same as those in `x`.
+
+```jldoclist
+julia> x = exampleobject(20, 10)
+
+julia> x2 = copy(x)
+
+julia> using DataFrames
+
+julia> setrowdata!(x2, DataFrame())
+
+# Change to reference is only reflected in x2.
+julia> size(rowdata(x))
+
+julia> size(rowdata(x2))
+
+# Otherwise, the references point to the same object.
+julia> insertcols!(coldata(x), 1, "WHEE" => 1:10);
+
+julia> names(coldata(x2))
+4-element Array{String,1}:
+ "WHEE"
+ "ID"
+ "Treatment"
+ "Response"
+```
+"""
 function Base.copy(x::SummarizedExperiment)
-    return SummarizedExperiment(
-        copy(x.assays), 
-        copy(x.rowdata), 
-        copy(x.coldata), 
-        copy(x.metadata)
-    )
+    output = SummarizedExperiment()
+
+    output.nrow = x.nrow
+    output.ncol = x.ncol
+    output.assays = x.assays
+    output.rowdata = x.rowdata
+    output.coldata = x.coldata
+    output.metadata = x.metadata
+
+    return output
 end
 
+"""
+    deepcopy(x::SummarizedExperiment)
+
+Return a deep copy of `x` and all of its components.
+
+```jldoclist
+julia> x = exampleobject(20, 10)
+
+julia> x2 = deepcopy(x)
+
+julia> setrowdata!(x2, DataFrame())
+
+# Change to reference is only reflected in x2.
+julia> size(rowdata(x))
+
+julia> size(rowdata(x2))
+
+# References now point to different objects.
+julia> insertcols!(coldata(x), 1, "WHEE" => 1:10);
+
+julia> names(coldata(x2))
+3-element Array{String,1}:
+ "ID"
+ "Treatment"
+ "Response"
+```
+"""
 function Base.deepcopy(x::SummarizedExperiment)
-    return SummarizedExperiment(
-        deepcopy(x.assays), 
-        deepcopy(x.rowdata), 
-        deepcopy(x.coldata), 
-        deepcopy(x.metadata)
-    )
+    output = SummarizedExperiment()
+
+    output.nrow = x.nrow
+    output.ncol = x.ncol
+    output.assays = deepcopy(x.assays)
+    output.rowdata = deepcopy(x.rowdata)
+    output.coldata = deepcopy(x.coldata)
+    output.metadata = deepcopy(x.metadata)
+
+    return output
 end
 
 function scat(io::IO, names::Vector{String})
@@ -30,6 +95,11 @@ function scat(io::IO, names::Vector{String})
     end
 end
 
+"""
+    print(io::IO, x::SummarizedExperiment)
+
+Print a summary of `x`.
+"""
 function Base.show(io::IO, x::SummarizedExperiment)
     xdim = size(x)
     print(io, string(xdim[1]) * "x" * string(xdim[2]) * " " * string(typeof(x)) * "\n")

@@ -22,9 +22,23 @@ mutable struct SummarizedExperiment
     metadata::Dict{String,Any}
 
     @doc """
+        SummarizedExperiment()
+
+    Create an empty `SummarizedExperiment`.
+    """
+    function SummarizedExperiment()
+        return new(0, 0, 
+           DataStructures.OrderedDict{String,AbstractArray}(), 
+           DataFrames.DataFrame(),
+           DataFrames.DataFrame(),
+           Dict{String,Any}()
+        )
+    end
+
+    @doc """
         SummarizedExperiment(assays, rowdata=DataFrame(), coldata=DataFrame(), metadata=Dict{String,Any}())
 
-    Create an instance of a `SummarizedExperiment`.
+    Create an instance of a `SummarizedExperiment` with the supplied assays and the (optional) row/column annotations.
 
     ```jldoctest
     julia> using DataFrames, DataStructures
