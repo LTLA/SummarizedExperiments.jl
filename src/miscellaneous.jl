@@ -34,6 +34,10 @@ function Base.show(io::IO, x::SummarizedExperiment)
     xdim = size(x)
     print(io, string(xdim[1]) * "x" * string(xdim[2]) * " " * string(typeof(x)) * "\n")
 
+    print(io, "  " * "assays(" * string(length(assays(x))) * "):")
+    scat(io, collect(keys(assays(x))))
+    print(io, "\n")
+
     print(io, "  " * "rowdata(" * string(size(rowdata(x))[2]) * "):")
     scat(io, names(rowdata(x)))
     print(io, "\n")
