@@ -6,6 +6,13 @@ import DataStructures
     size(x::SummarizedExperiment)
 
 Return a 2-tuple containing the number of rows and columns in `x`.
+
+```jldoctest
+julia> x = exampleobject(20, 10);
+
+julia> size(x)
+(20, 10)
+```
 """
 function Base.size(x::SummarizedExperiment)
     return (x.nrow, x.ncol)
@@ -16,6 +23,18 @@ end
 
 Return the row annotations as a `DataFrame` with number of rows equal to the number of rows in `x`.
 If no annotations are present, an empty `DataFrame` is returned instead.
+
+```jldoctest
+julia> x = exampleobject(20, 10);
+
+julia> names(rowdata(x))
+2-element Array{String,1}:
+ "ID"
+ "Type"
+
+julia> size(rowdata(x))
+(20, 2)
+```
 """
 function rowdata(x::SummarizedExperiment)
     return x.rowdata
@@ -27,6 +46,18 @@ end
 Set the row annotations in `x` to `value`.
 This can either be an empty `DataFrame` (i.e., no row annotations)
 or a `DataFrame` with number of rows equal to the number of rows in `x`.
+
+julia> x = exampleobject(20, 10);
+
+julia> using DataFrames
+
+julia> replacement = DataFrame(stuff = 1:20);
+
+julia> setrowdata!(x, replacement)
+
+julia> names(rowdata(x))
+1-element Array{String,1}:
+ "stuff"
 """    
 function setrowdata!(x::SummarizedExperiment, value::DataFrames.DataFrame)
     if size(value)[2] > 0 && size(value)[1] != x.nrow
@@ -41,6 +72,19 @@ end
 
 Return the column annotations as a `DataFrame` with number of rows equal to the number of columns in `x`.
 If no annotations are present, an empty `DataFrame` is returned instead.
+
+```jldoctest
+julia> x = exampleobject(20, 10);
+
+julia> names(coldata(x))
+3-element Array{String,1}:
+ "ID"
+ "Treatment"
+ "Response"
+
+julia> size(rowdata(x))
+(10, 3)
+```
 """
 function coldata(x::SummarizedExperiment)
     return x.coldata
@@ -52,6 +96,20 @@ end
 Set the column annotations in `x` to `value`.
 This can either be an empty `DataFrame` (i.e., no column annotations)
 or a `DataFrame` with number of rows equal to the number of columns in `x`.
+
+```jldoctest
+julia> x = exampleobject(20, 10);
+
+julia> using DataFrames
+
+julia> replacement = DataFrame(stuff = 1:10);
+
+julia> setcoldata!(x, replacement)
+
+julia> names(coldata(x))
+1-element Array{String,1}:
+ "stuff"
+```
 """    
 function setcoldata!(x::SummarizedExperiment, value::DataFrames.DataFrame)
     if size(value)[2] > 0 && size(value)[1] != x.ncol
@@ -67,6 +125,17 @@ end
 Return the requested assay in `x`.
 `i` may be an integer specifying an index or a string containing the name.
 If `i` is not supplied, the first assay is returned.
+
+```jldoctest
+julia> x = exampleobject(20, 10)
+
+# All of these give the same value.
+julia> assay(x);
+
+julia> assay(x, 1);
+
+julia> assay(x, "foo");
+```
 """
 function assay(x::SummarizedExperiment)
     return assay(x, 1)
@@ -99,6 +168,24 @@ The first two dimensions of `value` must have extent equal to those of `x`.
 `i` may be an integer specifying an index, in which case it must be positive and no greater than `length(assays(x))`;
 or a string containing the name, in which case it may be an existing or new name.
 If `i` is not supplied, `value` is set to the first assay.
+
+```jldoctest
+julia> x = exampleobject(20, 10)
+
+julia> sum(assay(x))
+
+julia> sum(assay(x, 2))
+
+# Replacing the first assay with the second.
+julia> setassay!(x, assay(x, 2))
+
+julia> sum(assay(x))
+
+# More explicit forms of the above.
+julia> setassay!(x, 1, assay(x, 2));
+
+julia> setassay!(x, "foo", assay(x, 2));
+```
 """
 function setassay!(x::SummarizedExperiment, value::AbstractArray)
     setassay!(x, 1, value)
@@ -136,6 +223,16 @@ end
     assays(x)
 
 Return all assays from `x`.
+
+```jldoctest
+julia> x = exampleobject(20, 10)
+
+julia> collect(keys(assays(x)))
+3-element Array{String,1}:
+ "foo"
+ "bar"
+ "whee"
+```
 """
 function assays(x::SummarizedExperiment)
     return x.assays
@@ -146,11 +243,29 @@ end
 
 Set assays in `x` to `value`.
 All values in `value` should have the same extents for the first two dimensions.
+
+```jldoctest
+julia> x = exampleobject(20, 10)
+
+julia> length(assays(x))
+3
+
+julia> refresh = copy(assays(x));
+
+julia> delete!(refresh, "foo");
+
+julia> setassays!(x, refresh)
+
+julia> length(assays(x))
+2
+```
 """
 function setassays!(x::SummarizedExperiment, value::DataStructures.OrderedDict{String,AbstractArray})
-    xdims = size(x)
     for (name, val) in value
-        check_assay_dims(size(val), xdims, "value[" * repr(name) * "]", "x")
+        dim = size(val)
+        if dim[1] != x.nrow || dim[2] != x.ncol
+            throw(DimensionMismatch("dimensions of 'value[" * repr(name) * "]' should be the same as those of 'x'"))
+        end
     end
     x.assays = value
     return
@@ -160,6 +275,14 @@ end
     metadata(x)
 
 Return all metadata from `x`.
+
+```jldoctest
+julia> x = exampleobject(20, 10)
+
+julia> metadata(x)
+Dict{String,Any} with 1 entry:
+  "version" => "1.1.0"
+```
 """
 function metadata(x::SummarizedExperiment)
     return x.metadata;
@@ -169,6 +292,16 @@ end
     setmetadata!(x, value)
 
 Set metadata in `x` to `value`.
+
+```jldoctest
+julia> x = exampleobject(20, 10)
+
+julia> setmetadata!(x, Dict{String,Any}("foo" => 200));
+
+julia> metadata(x)
+Dict{String,Any} with 1 entry:
+  "foo" => 200
+```
 """
 function setmetadata!(x::SummarizedExperiment, value::Dict{String,Any})
     x.metadata = value;

@@ -28,12 +28,16 @@ mutable struct SummarizedExperiment
 
     ```jldoctest
     julia> using DataFrames, DataStructures
+
     julia> assays = OrderedDict{String, AbstractArray}(
               "foobar" => [[1,2] [3,4] [5,6]], 
-              "whee" => [[1.2,2.3] [3.4,4.5] [5.6,7.8]])
-    julia> coldata = DataFrame(Treatment=["normal", "drug1", "drug2"])
+              "whee" => [[1.2,2.3] [3.4,4.5] [5.6,7.8]]);
+
+    julia> coldata = DataFrame(Treatment=["normal", "drug1", "drug2"]);
+
     julia> x = SummarizedExperiments.SummarizedExperiment(assays, DataFrame(), coldata)
     2x3 SummarizedExperiments.SummarizedExperiment
+      assays(3): foobar whee
       rowdata(0):
       coldata(1): Treatment
       metadata(0):
