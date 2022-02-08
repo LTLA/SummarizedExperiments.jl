@@ -2,19 +2,31 @@ export SummarizedExperiment
 import DataFrames
 import DataStructures
 
+function check_dataframe_has_name(x::DataFrames.DataFrame)
+    return size(x)[2] >= 1 && names(x)[1] == "name"
+end
+
+function check_dataframe_firstcol(x::DataFrames.DataFrame)
+    first = x[!,1]
+    return isa(first, Vector{String}) || isa(first, Vector{Nothing})
+end
+
 function check_dataframe_in_constructor(x::DataFrames.DataFrame, expected::Int, message::String)
     if size(x)[1] != expected 
         throw(DimensionMismatch("unexpected number of rows for '" * message * "'"))
     end
 
-    if size(x)[2] < 1 || names(x)[1] != "name"
+    if !check_dataframe_has_name(x)
         throw(ArgumentError("first column of '" * message * "' should be 'name'"))
     end
 
-    first = x[!,1]
-    if !isa(first, Vector{String}) && !isa(first, Vector{Nothing})
+    if !check_dataframe_firstcol(x)
         throw(ArgumentError("first column of '" * message * "' should contain strings or nothings"))
     end
+end
+
+function check_assay_dimensions(dims::Tuple{Vararg{Int}}, ref::Tuple{Vararg{Int}})
+    return length(dims) >= 2 && dims[1] == ref[1] && dims[2] == ref[2]
 end
 
 """
@@ -99,24 +111,23 @@ mutable struct SummarizedExperiment
         if length(refdims) < 2 
             throw(DimensionMismatch("'assays' should contain arrays with 2 or more dimensions"))
         end
-        nrow = refdims[1]
-        ncol = refdims[2]
 
         first_name = first(assays).first
         for (key, val) in assays
-            dims = size(val)
-            if length(dims) < 2 || dims[1] != nrow || dims[2] != ncol
+            if !check_assay_dimensions(size(val), refdims)
                 throw(DimensionMismatch("'assays[" * repr(key) * "]' and 'assays[" * repr(first_name) * 
                     "]' should have the same extents for the first 2 dimensions"))
             end
         end
 
+        nrow = refdims[1]
         if isa(rowdata, Nothing)
             rowdata = DataFrames.DataFrame(name = Vector{Nothing}(undef, nrow))
         else
             check_dataframe_in_constructor(rowdata, nrow, "rowdata")
         end
 
+        ncol = refdims[2]
         if isa(coldata, Nothing)
             coldata = DataFrames.DataFrame(name = Vector{Nothing}(undef, ncol))
         else
