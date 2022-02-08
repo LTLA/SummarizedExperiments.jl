@@ -32,8 +32,6 @@ julia> names(coldata(x2))
 function Base.copy(x::SummarizedExperiment)
     output = SummarizedExperiment()
 
-    output.nrow = x.nrow
-    output.ncol = x.ncol
     output.assays = x.assays
     output.rowdata = x.rowdata
     output.coldata = x.coldata
@@ -75,8 +73,6 @@ julia> names(coldata(x2))
 function Base.deepcopy(x::SummarizedExperiment)
     output = SummarizedExperiment()
 
-    output.nrow = x.nrow
-    output.ncol = x.ncol
     output.assays = deepcopy(x.assays)
     output.rowdata = deepcopy(x.rowdata)
     output.coldata = deepcopy(x.coldata)
@@ -93,7 +89,7 @@ function scat(io::IO, names::Vector{String})
     else
         print(io, " " * names[1])
         print(io, " " * names[2])
-        print(io, " ... ")
+        print(io, " ...")
         print(io, " " * names[length(names)-1])
         print(io, " " * names[length(names)])
     end
@@ -108,12 +104,26 @@ function Base.show(io::IO, x::SummarizedExperiment)
     xdim = size(x)
     print(io, string(xdim[1]) * "x" * string(xdim[2]) * " " * string(typeof(x)) * "\n")
 
-    print(io, "  " * "assays(" * string(length(assays(x))) * "):")
+    print(io, "  assays(" * string(length(assays(x))) * "):")
     scat(io, collect(keys(assays(x))))
     print(io, "\n")
 
-    print(io, "  " * "rowdata(" * string(size(rowdata(x))[2]) * "):")
+    print(io, "  rownames:")
+    rn = rowdata(x)[!,1]
+    if isa(rn, Vector{String})
+        scat(io, rn)
+    end
+    print(io, "\n")
+
+    print(io, "  rowdata(" * string(size(rowdata(x))[2]) * "):")
     scat(io, names(rowdata(x)))
+    print(io, "\n")
+
+    print(io, "  colnames:")
+    cn = coldata(x)[!,1]
+    if isa(cn, Vector{String})
+        scat(io, cn)
+    end
     print(io, "\n")
 
     print(io, "  " * "coldata(" * string(size(coldata(x))[2]) * "):")

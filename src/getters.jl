@@ -18,14 +18,15 @@ julia> size(x)
 ```
 """
 function Base.size(x::SummarizedExperiment)
-    return (x.nrow, x.ncol)
+    return (size(x.rowdata)[1], size(x.coldata)[1])
 end
 
 """
     rowdata(x)
 
 Return the row annotations as a `DataFrame` with number of rows equal to the number of rows in `x`.
-If no annotations are present, an empty `DataFrame` is returned instead.
+The first column is called `"name"` and contains the row names of `x`;
+this can either be a `Vector{String}` or a `Vector{Nothing}` (if no row names are available).
 
 # Examples
 ```jldoctest
@@ -35,7 +36,7 @@ julia> x = exampleobject(20, 10);
 
 julia> names(rowdata(x))
 2-element Array{String,1}:
- "ID"
+ "name"
  "Type"
 
 julia> size(rowdata(x))
@@ -46,12 +47,32 @@ function rowdata(x::SummarizedExperiment)
     return x.rowdata
 end
 
+function check_dataframe_in_setter(value::DataFrames.DataFrame, expected::Int, message::String)
+    if size(value)[1] != expected
+        throw(DimensionMismatch("'value' and '" * message *"(x)' should have the same number of rows"))
+    end
+
+    if size(value)[2] < 1 || names(value)[1] != "name"
+        throw(DimensionMismatch("first column of 'value' should exist and be called 'name'"))
+    end
+
+    firstcol = value[!,1]
+    if !isa(firstcol, Vector{String}) && !isa(firstcol, Vector{Nothing})
+        throw(ArgumentError("first column of 'value' should contain strings or nothings"));
+    end
+end
+
 """
     setrowdata!(x, value)
 
 Set the row annotations in `x` to `value`.
-This can either be an empty `DataFrame` (i.e., no row annotations)
-or a `DataFrame` with number of rows equal to the number of rows in `x`.
+
+If `value` is a `DataFrame`, the first column should be called `"name"` and contain the row names of `x`;
+this can either be a `Vector{String}` or a `Vector{Nothing}` (if no row names are available).
+
+If `value` is `nothing`, this is considered to be equivalent to a `DataFrame` with one `"name"` column containing `nothing`s.
+
+The return value is a reference to the modified `x`.
 
 # Examples
 ```jldoctest
@@ -61,28 +82,35 @@ julia> x = exampleobject(20, 10);
 
 julia> using DataFrames
 
-julia> replacement = DataFrame(stuff = 1:20);
+julia> replacement = copy(rowdata(x));
 
-julia> setrowdata!(x, replacement)
+julia> replacement[!,"foobar"] = [ rand() for i in 1:size(x)[1] ];
+
+julia> setrowdata!(x, replacement);
 
 julia> names(rowdata(x))
-1-element Array{String,1}:
- "stuff"
+2-element Array{String,1}:
+ "name"
+ "Type"
+ "foobar"
 ```
 """    
-function setrowdata!(x::SummarizedExperiment, value::DataFrames.DataFrame)
-    if size(value)[2] > 0 && size(value)[1] != x.nrow
-        throw(DimensionMismatch("'value' and 'rowdata(x)' should have the same number of rows"))
+function setrowdata!(x::SummarizedExperiment, value::Union{DataFrames.DataFrame,Nothing})
+    if isa(value, Nothing)
+        x.rowdata = DataFrames.DataFrame(name = Vector{Nothing}(undef, size(x)[1]))
+    else
+        check_dataframe_in_setter(value, size(x)[1], "rowdata")
+        x.rowdata = value
     end
-    x.rowdata = value
-    return
+    return x
 end 
 
 """
     coldata(x)
 
 Return the column annotations as a `DataFrame` with number of rows equal to the number of columns in `x`.
-If no annotations are present, an empty `DataFrame` is returned instead.
+The first column is called `"name"` and contains the column names of `x`;
+this can either be a `Vector{String}` or a `Vector{Nothing}` (if no column names are available).
 
 # Examples
 ```jldoctest
@@ -92,7 +120,7 @@ julia> x = exampleobject(20, 10);
 
 julia> names(coldata(x))
 3-element Array{String,1}:
- "ID"
+ "name"
  "Treatment"
  "Response"
 
@@ -108,8 +136,13 @@ end
     setcoldata!(x, value)
 
 Set the column annotations in `x` to `value`.
-This can either be an empty `DataFrame` (i.e., no column annotations)
-or a `DataFrame` with number of rows equal to the number of columns in `x`.
+
+If `value` is a `DataFrame`, the first column should be called `"name"` and contain the column names of `x`;
+this can either be a `Vector{String}` or a `Vector{Nothing}` (if no column names are available).
+
+If `value` is `nothing`, this is considered to be equivalent to a `DataFrame` with one `"name"` column containing `nothing`s.
+
+The return value is a reference to the modified `x`.
 
 # Examples
 ```jldoctest
@@ -119,21 +152,28 @@ julia> x = exampleobject(20, 10);
 
 julia> using DataFrames
 
-julia> replacement = DataFrame(stuff = 1:10);
+julia> replacement = copy(coldata(x));
 
-julia> setcoldata!(x, replacement)
+julia> replacement[!,"foobar"] = [ rand() for i in 1:size(x)[2] ];
+
+julia> setcoldata!(x, replacement);
 
 julia> names(coldata(x))
-1-element Array{String,1}:
- "stuff"
+4-element Array{String,1}:
+ "name"
+ "Treatment"
+ "Response"
+ "foobar"
 ```
-"""    
-function setcoldata!(x::SummarizedExperiment, value::DataFrames.DataFrame)
-    if size(value)[2] > 0 && size(value)[1] != x.ncol
-        throw(DimensionMismatch("'value' and 'coldata(x)' should have the same number of rows"))
+"""
+function setcoldata!(x::SummarizedExperiment, value::Union{DataFrames.DataFrame,Nothing})
+    if isa(value, Nothing)
+        x.coldata = DataFrames.DataFrame(name = Vector{Nothing}(undef, size(x)[2]))
+    else
+        check_dataframe_in_setter(value, size(x)[2], "coldata")
+        x.coldata = value
     end
-    x.coldata = value
-    return
+    return x
 end 
 
 """

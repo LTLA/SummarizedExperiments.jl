@@ -23,15 +23,19 @@ julia> x = exampleobject(20, 10);
 julia> x[1,:]
 1x10 SummarizedExperiment
   assays(3): foo bar whee
-  rowdata(2): ID Type
-  coldata(3): ID Treatment Response
+  rownames: Gene1
+  rowdata(2): name Type
+  colnames: Patient1 Patient2 ... Patient9 Patient10
+  coldata(3): name Treatment Response
   metadata(1): version
 
 julia> x[:,1:5]
 20x5 SummarizedExperiment
   assays(3): foo bar whee
-  rowdata(2): ID Type
-  coldata(3): ID Treatment Response
+  rownames: Gene1 Gene2 ... Gene19 Gene20
+  rowdata(2): name Type
+  colnames: Patient1 Patient2 ... Patient4 Patient5
+  coldata(3): name Treatment Response
   metadata(1): version
 
 julia> keep = [ i > 5 for i in 1:size(x)[1] ];
@@ -39,8 +43,10 @@ julia> keep = [ i > 5 for i in 1:size(x)[1] ];
 julia> x[keep,1:2]
 15x2 SummarizedExperiment
   assays(3): foo bar whee
-  rowdata(2): ID Type
-  coldata(3): ID Treatment Response
+  rownames: Gene6 Gene7 ... Gene19 Gene20
+  rowdata(2): name Type
+  colnames: Patient1 Patient2
+  coldata(3): name Treatment Response
   metadata(1): version
 ```
 """
@@ -63,17 +69,8 @@ function Base.getindex(x::SummarizedExperiment, I...)
         index_cols = indices[2]
     end
 
-    # Subsetting the row data.
-    new_rowdata = x.rowdata
-    if size(new_rowdata)[2] > 0
-        new_rowdata = new_rowdata[index_rows,:]
-    end
-
-    # Subsetting the column data.
-    new_coldata = x.coldata
-    if size(new_coldata)[2] > 0
-        new_coldata = x.coldata[index_cols,:]
-    end
+    new_rowdata = x.rowdata[index_rows,:]
+    new_coldata = x.coldata[index_cols,:]
 
     new_assays = DataStructures.OrderedDict{String,AbstractArray}();
     for (key, val) in x.assays
@@ -84,9 +81,5 @@ function Base.getindex(x::SummarizedExperiment, I...)
         new_assays[key] = getindex(val, subdex...)
     end
 
-    output = SummarizedExperiment(new_assays, new_rowdata, new_coldata, copy(x.metadata))
-    output.nrow = length(index_rows)
-    output.ncol = length(index_cols)
-
-    return output
+    return SummarizedExperiment(new_assays, new_rowdata, new_coldata, copy(x.metadata))
 end
