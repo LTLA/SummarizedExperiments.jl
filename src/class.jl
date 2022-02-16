@@ -52,10 +52,11 @@ mutable struct SummarizedExperiment
     Create an empty `SummarizedExperiment`.
     """
     function SummarizedExperiment()
-        return SummarizedExperiment(
+        dummy = DataFrames.DataFrame(name = String[])
+        new(
            DataStructures.OrderedDict{String,AbstractArray}(), 
-           nothing,
-           nothing,
+           dummy,
+           deepcopy(dummy),
            Dict{String,Any}()
         )
     end
@@ -73,6 +74,9 @@ mutable struct SummarizedExperiment
     Similarly, for a `DataFrame` in `coldata`, the number of rows must be equal to the extnt of the second dimension.
     The first column must be called `"name"` and contain a `Vector` of `String`s or `Nothing`s (if no names are available).
     If `nothing` is supplied, an empty `DataFrame` is created with a `"name"` column containing all `nothing`s.
+
+    `assays` may be empty if `rowdata` and `coldata` are both non-`nothing`.
+    Otherwise an error will be raised as the dimensions of the `SummarizedExperiment` cannot be determined.
 
     # Examples
     ```jldoctest
@@ -103,13 +107,18 @@ mutable struct SummarizedExperiment
             metadata::Dict{String,Any} = Dict{String,Any}()
         )
 
+        refdims = (0, 0)
         if length(assays) < 1
-            throw(BoundsError("expected as least one array in 'assays'"))
-        end
-
-        refdims = size(first(assays).second)
-        if length(refdims) < 2 
-            throw(DimensionMismatch("'assays' should contain arrays with 2 or more dimensions"))
+            if rowdata == nothing || coldata == nothing
+                throw(ErrorException("expected at least one array in 'assays' if 'rowdata' or 'coldata' are not supplied"))
+            end
+            refdims = (size(rowdata)[1], size(coldata)[1])
+        else 
+            firstdims = size(first(assays).second)
+            if length(refdims) < 2 
+                throw(DimensionMismatch("'assays' should contain arrays with 2 or more dimensions"))
+            end
+            refdims = (firstdims[1], firstdims[2])
         end
 
         first_name = first(assays).first
