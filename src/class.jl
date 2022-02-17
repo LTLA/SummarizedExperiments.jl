@@ -8,7 +8,7 @@ end
 
 function check_dataframe_firstcol(x::DataFrames.DataFrame)
     first = x[!,1]
-    return isa(first, Vector{String}) || isa(first, Vector{Nothing})
+    return isa(first, AbstractVector{<:AbstractString}) || isa(first, Vector{Nothing})
 end
 
 function check_dataframe_in_constructor(x::DataFrames.DataFrame, expected::Int, message::String)

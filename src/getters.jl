@@ -76,12 +76,11 @@ function check_dataframe_in_setter(value::DataFrames.DataFrame, expected::Int, m
         throw(DimensionMismatch("'value' and '" * message *"(x)' should have the same number of rows"))
     end
 
-    if size(value)[2] < 1 || names(value)[1] != "name"
+    if !check_dataframe_has_name(value)
         throw(DimensionMismatch("first column of 'value' should exist and be called 'name'"))
     end
 
-    firstcol = value[!,1]
-    if !isa(firstcol, Vector{String}) && !isa(firstcol, Vector{Nothing})
+    if !check_dataframe_firstcol(value)
         throw(ArgumentError("first column of 'value' should contain strings or nothings"));
     end
 end

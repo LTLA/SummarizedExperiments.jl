@@ -81,7 +81,7 @@ function Base.deepcopy(x::SummarizedExperiment)
     return output
 end
 
-function scat(io::IO, names::Vector{String})
+function scat(io::IO, names::AbstractVector{<:AbstractString})
     if length(names) < 5
         for n in names
             print(io, " " * n)
@@ -110,7 +110,7 @@ function Base.show(io::IO, x::SummarizedExperiment)
 
     print(io, "  rownames:")
     rn = rowdata(x)[!,1]
-    if isa(rn, Vector{String})
+    if isa(rn, AbstractVector{<:AbstractString})
         scat(io, rn)
     end
     print(io, "\n")
@@ -121,7 +121,7 @@ function Base.show(io::IO, x::SummarizedExperiment)
 
     print(io, "  colnames:")
     cn = coldata(x)[!,1]
-    if isa(cn, Vector{String})
+    if isa(cn, AbstractVector{<:AbstractString})
         scat(io, cn)
     end
     print(io, "\n")
