@@ -64,10 +64,21 @@ julia> assay(x)
  etc. etc.
 ```
 
+## Class definition
+
+```@docs
+SummarizedExperiment
+```
+
 ## Constructors
 
 ```@docs
-SummarizedExperiment(assays::DataStructures.OrderedDict{String, AbstractArray})
+SummarizedExperiment(
+    assays::DataStructures.OrderedDict{String, AbstractArray},
+    rowdata::Union{Nothing, DataFrames.DataFrame} = nothing, 
+    coldata::Union{Nothing, DataFrames.DataFrame} = nothing, 
+    metadata::Dict{String, Any} = Dict{String,Any}()
+)
 ```
 
 ```@docs
@@ -158,7 +169,11 @@ Base.deepcopy(x::SummarizedExperiment)
 Base.show(io::IO, x::SummarizedExperiment)
 ```
 
+```@docs
+exampleobject(nrow::Int, ncol::Int)
+```
+
 ## Contact
 
 This package is maintained by Aaron Lun ([**@LTLA**](https://github.com/LTLA)).
-Post bug reports and feature requests as issues on the [GitHub repository](https://github.com/LTLA/SummarizedExperiments.jl/issues).
+If you have bug reports or feature requests, please post them as issues at the [GitHub repository](https://github.com/LTLA/SummarizedExperiments.jl/issues).

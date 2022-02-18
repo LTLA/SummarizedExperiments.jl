@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+      - master
+    tags: '*'
+  pull_request:
+
+name: Build documentation
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@latest
+      - name: Install dependencies
+        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+      - name: Install more dependencies
+        run: julia --project=docs/ -e 'using Pkg; Pkg.add("Documenter"); Pkg.add("DataStructures"); Pkg.add("DataFrames")'
+      - name: Build and deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: julia --project=docs/ docs/make.jl
