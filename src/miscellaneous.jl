@@ -96,9 +96,9 @@ function scat(io::IO, names::AbstractVector{<:AbstractString})
 end
 
 """
-    print(io::IO, x::SummarizedExperiment)
+    show(io::IO, x::SummarizedExperiment)
 
-Print a summary of `x`.
+Show a summary of `x`, printing the details to the specified `io` device.
 """
 function Base.show(io::IO, x::SummarizedExperiment)
     xdim = size(x)

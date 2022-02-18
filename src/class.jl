@@ -49,7 +49,7 @@ mutable struct SummarizedExperiment
     @doc """
         SummarizedExperiment()
 
-    Create an empty `SummarizedExperiment`.
+    Create an empty `SummarizedExperiment` with no assays and empty row/column annotations.
     """
     function SummarizedExperiment()
         dummy = DataFrames.DataFrame(name = String[])

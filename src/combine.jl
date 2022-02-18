@@ -54,7 +54,7 @@ The output `coldata` is created by combining columns horizontally across `coldat
 if columns have duplicate names, only the first instance of each column is retained.
 
 # Examples
-```jldoclist
+```jldoctest
 julia> using SummarizedExperiments
 
 julia> x = exampleobject(20, 10);
@@ -130,7 +130,7 @@ The output `rowdata` is created by combining columns horizontally across `rowdat
 if columns have duplicate names, only the first instance of each column is retained.
 
 # Examples
-```jldoclist
+```jldoctest
 julia> using SummarizedExperiments
 
 julia> x = exampleobject(20, 20);

@@ -1,4 +1,6 @@
 using SummarizedExperiments
-using Documenter, Example
+using Documenter
+import DataStructures
+import DataFrames
 makedocs(sitename="SummarizedExperiments")
 
