@@ -3,10 +3,10 @@ import DataStructures
 Base.IndexStyle(x::SummarizedExperiment) = IndexCartesian()
 
 """
-    getindex(x::SummarizedExperiment, I...)
+    getindex(x::SummarizedExperiment, i, j)
 
-Subset `x` by the rows or columns based on the first and second arguments to `I`, respectively.
-Types for the arguments to `I` are similar to those for arrays:
+Subset `x` by the rows or columns based on `i` and `j`, respectively.
+Types for the arguments to `i` and `j` are similar to those for arrays:
 
 - An integer `Vector` containing indices.
 - An `Int` containing a single index.
@@ -50,12 +50,8 @@ julia> x[keep,1:2]
   metadata(1): version
 ```
 """
-function Base.getindex(x::SummarizedExperiment, I...)
-    if length(I) != 2
-        throw(DimensionMismatch("exactly two indices are required for SummarizedExperiment indexing"))
-    end
-
-    indices = to_indices(x, I)
+function Base.getindex(x::SummarizedExperiment, i, j)
+    indices = to_indices(x, (i, j))
 
     if isa(indices[1], Int)
         index_rows = [indices[1]]
