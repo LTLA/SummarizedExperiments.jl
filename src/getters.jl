@@ -39,7 +39,7 @@ function check_dataframe_in_getter(value::DataFrames.DataFrame, expected::Int, m
 end
 
 """
-    rowdata(x, check = true)
+    rowdata(x; check = true)
 
 Return the row annotations as a `DataFrame` with number of rows equal to the number of rows in `x`.
 The first column is called `"name"` and contains the row names of `x`;
@@ -63,7 +63,7 @@ julia> size(rowdata(x))
 (20, 2)
 ```
 """
-function rowdata(x::SummarizedExperiment, check::Bool = true)
+function rowdata(x::SummarizedExperiment; check = true)
     output = x.rowdata
     if check
         check_dataframe_in_getter(output, size(x)[1], "rowdata")
@@ -154,7 +154,7 @@ julia> size(coldata(x))
 (10, 3)
 ```
 """
-function coldata(x::SummarizedExperiment, check::Bool = true)
+function coldata(x::SummarizedExperiment; check = true)
     output = x.coldata
     if check
         check_dataframe_in_getter(output, size(x)[2], "coldata")
@@ -207,7 +207,7 @@ function setcoldata!(x::SummarizedExperiment, value::Union{DataFrames.DataFrame,
 end 
 
 """
-    assay(x[, i], check = true)
+    assay(x[, i]; check = true)
 
 Return the requested assay in `x`.
 `i` may be an integer specifying an index or a string containing the name.
@@ -231,11 +231,11 @@ julia> assay(x, 1);
 julia> assay(x, "foo");
 ```
 """
-function assay(x::SummarizedExperiment, check::Bool = true)
+function assay(x::SummarizedExperiment; check = true)
     return assay(x, 1, check)
 end
 
-function assay(x::SummarizedExperiment, i::Int64, check::Bool = true)
+function assay(x::SummarizedExperiment, i::Int64; check = true)
     counter = 0
 
     for val in values(x.assays)
@@ -253,7 +253,7 @@ function assay(x::SummarizedExperiment, i::Int64, check::Bool = true)
     throw(BoundsError("'i = " * string(i) * "' is out of range of 'assays(x)'"))
 end
 
-function assay(x::SummarizedExperiment, i::String, check::Bool = true)
+function assay(x::SummarizedExperiment, i::String; check = true)
     if !haskey(x.assays, i)
         throw(KeyError("'" * i * "' is not present in 'assays(x)'"))
     end
@@ -333,7 +333,7 @@ function setassay!(x::SummarizedExperiment, i::String, value::AbstractArray)
 end
 
 """
-    assays(x, check = true)
+    assays(x; check = true)
 
 Return all assays from `x`.
 Each returned assay should have the same extents as `x` for the first two dimensions.
@@ -353,7 +353,7 @@ julia> collect(keys(assays(x)))
  "whee"
 ```
 """
-function assays(x::SummarizedExperiment, check::Bool = true)
+function assays(x::SummarizedExperiment; check = true)
     if check
         for (k, v) in x.assays
             if !check_assay_dimensions(size(v), size(x))
