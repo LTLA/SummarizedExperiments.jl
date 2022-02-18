@@ -43,9 +43,9 @@ end
 
 Return the row annotations as a `DataFrame` with number of rows equal to the number of rows in `x`.
 The first column is called `"name"` and contains the row names of `x`;
-this can either be a `Vector{String}` or a `Vector{Nothing}` (if no row names are available).
+this can either be an `AbstractVector{AbstractString}` or a `Vector{Nothing}` (if no row names are available).
 
-If `check = true`, this function will verify that the expectations on the returned `DataFrame` are satisfied.
+If `check = true`, this function will verify that the above expectations on the returned `DataFrame` are satisfied.
 Any failures will cause warnings to be emitted.
 
 # Examples
@@ -70,63 +70,6 @@ function rowdata(x::SummarizedExperiment; check = true)
     end
     return output
 end
-
-function check_dataframe_in_setter(value::DataFrames.DataFrame, expected::Int, message::String)
-    if size(value)[1] != expected
-        throw(DimensionMismatch("'value' and '" * message *"(x)' should have the same number of rows"))
-    end
-
-    if !check_dataframe_has_name(value)
-        throw(DimensionMismatch("first column of 'value' should exist and be called 'name'"))
-    end
-
-    if !check_dataframe_firstcol(value)
-        throw(ArgumentError("first column of 'value' should contain strings or nothings"));
-    end
-end
-
-"""
-    setrowdata!(x, value)
-
-Set the row annotations in `x` to `value`.
-
-If `value` is a `DataFrame`, the first column should be called `"name"` and contain the row names of `x`;
-this can either be a `Vector{String}` or a `Vector{Nothing}` (if no row names are available).
-
-If `value` is `nothing`, this is considered to be equivalent to a `DataFrame` with one `"name"` column containing `nothing`s.
-
-The return value is a reference to the modified `x`.
-
-# Examples
-```jldoctest
-julia> using SummarizedExperiments
-
-julia> x = exampleobject(20, 10);
-
-julia> using DataFrames
-
-julia> replacement = copy(rowdata(x));
-
-julia> replacement[!,"foobar"] = [ rand() for i in 1:size(x)[1] ];
-
-julia> setrowdata!(x, replacement);
-
-julia> names(rowdata(x))
-2-element Array{String,1}:
- "name"
- "Type"
- "foobar"
-```
-"""    
-function setrowdata!(x::SummarizedExperiment, value::Union{DataFrames.DataFrame,Nothing})
-    if isa(value, Nothing)
-        x.rowdata = DataFrames.DataFrame(name = Vector{Nothing}(undef, size(x)[1]))
-    else
-        check_dataframe_in_setter(value, size(x)[1], "rowdata")
-        x.rowdata = value
-    end
-    return x
-end 
 
 """
     coldata(x, check = true)
@@ -163,55 +106,11 @@ function coldata(x::SummarizedExperiment; check = true)
 end
 
 """
-    setcoldata!(x, value)
-
-Set the column annotations in `x` to `value`.
-
-If `value` is a `DataFrame`, the first column should be called `"name"` and contain the column names of `x`;
-this can either be a `Vector{String}` or a `Vector{Nothing}` (if no column names are available).
-
-If `value` is `nothing`, this is considered to be equivalent to a `DataFrame` with one `"name"` column containing `nothing`s.
-
-The return value is a reference to the modified `x`.
-
-# Examples
-```jldoctest
-julia> using SummarizedExperiments
-
-julia> x = exampleobject(20, 10);
-
-julia> using DataFrames
-
-julia> replacement = copy(coldata(x));
-
-julia> replacement[!,"foobar"] = [ rand() for i in 1:size(x)[2] ];
-
-julia> setcoldata!(x, replacement);
-
-julia> names(coldata(x))
-4-element Array{String,1}:
- "name"
- "Treatment"
- "Response"
- "foobar"
-```
-"""
-function setcoldata!(x::SummarizedExperiment, value::Union{DataFrames.DataFrame,Nothing})
-    if isa(value, Nothing)
-        x.coldata = DataFrames.DataFrame(name = Vector{Nothing}(undef, size(x)[2]))
-    else
-        check_dataframe_in_setter(value, size(x)[2], "coldata")
-        x.coldata = value
-    end
-    return x
-end 
-
-"""
     assay(x[, i]; check = true)
 
 Return the requested assay in `x`.
 `i` may be an integer specifying an index or a string containing the name.
-If `i` is not supplied, the first assay is returned.
+If `i` is not supplied, the first assay is returned. 
 
 The returned assay should have the same extents as `x` for the first two dimensions.
 If `check = true`, this function will verify that this expectation is satisfied.
@@ -269,73 +168,9 @@ function assay(x::SummarizedExperiment, i::String; check = true)
 end
 
 """
-    setassay!(x[, i], value)
-
-Set the requested assay in `x` to `value`.
-The first two dimensions of `value` must have extent equal to those of `x`.
-`i` may be an integer specifying an index, in which case it must be positive and no greater than `length(assays(x))`;
-or a string containing the name, in which case it may be an existing or new name.
-If `i` is not supplied, `value` is set to the first assay.
-
-# Examples
-```jldoctest
-julia> using SummarizedExperiments
-
-julia> x = exampleobject(20, 10);
-
-julia> first_sum = sum(assay(x));
-
-julia> second_sum = sum(assay(x, 2));
-
-julia> setassay!(x, assay(x, 2)); # Replacing the first assay with the second.
-
-julia> first_sum == sum(assay(x))
-false
-
-julia> second_sum == sum(assay(x))
-true
-
-julia> setassay!(x, 1, assay(x, 2)); # More explicit forms of the above.
-
-julia> setassay!(x, "foo", assay(x, 2));
-```
-"""
-function setassay!(x::SummarizedExperiment, value::AbstractArray)
-    setassay!(x, 1, value)
-    return
-end
-
-function setassay!(x::SummarizedExperiment, i::Int64, value::AbstractArray)
-    dim = size(value)
-    if dim[1] != x.nrow || dim[2] != x.ncol
-        throw(DimensionMismatch("dimensions of 'value' should be the same as those of 'x'"))
-    end
-
-    counter = 0
-    for k in keys(x.assays)
-        counter += 1
-        if counter == i
-            x.assays[k] = value
-            return
-        end
-    end
-
-    throw(BoundsError("'i = " * string(i) * "' is out of range of 'assays(x)'"))
-end
-
-function setassay!(x::SummarizedExperiment, i::String, value::AbstractArray)
-    dim = size(value)
-    if dim[1] != x.nrow || dim[2] != x.ncol
-        throw(DimensionMismatch("dimensions of 'value' should be the same as those of 'x'"))
-    end
-    x.assays[i] = value
-    return
-end
-
-"""
     assays(x; check = true)
 
-Return all assays from `x`.
+Return all assays from `x` as an `OrderedDict` where the keys are the assay names.
 Each returned assay should have the same extents as `x` for the first two dimensions.
 If `check = true`, this function will verify that this expectation is satisfied.
 Any failures will cause warnings to be emitted.
@@ -365,45 +200,9 @@ function assays(x::SummarizedExperiment; check = true)
 end
 
 """
-    setassays!(x, value)
-
-Set assays in `x` to `value`.
-All values in `value` should have the same extents for the first two dimensions.
-
-# Examples
-```jldoctest
-julia> using SummarizedExperiments
-
-julia> x = exampleobject(20, 10);
-
-julia> length(assays(x))
-3
-
-julia> refresh = copy(assays(x));
-
-julia> delete!(refresh, "foo");
-
-julia> setassays!(x, refresh)
-
-julia> length(assays(x))
-2
-```
-"""
-function setassays!(x::SummarizedExperiment, value::DataStructures.OrderedDict{String,AbstractArray})
-    for (name, val) in value
-        dim = size(val)
-        if dim[1] != x.nrow || dim[2] != x.ncol
-            throw(DimensionMismatch("dimensions of 'value[" * repr(name) * "]' should be the same as those of 'x'"))
-        end
-    end
-    x.assays = value
-    return
-end
-
-"""
     metadata(x)
 
-Return all metadata from `x`.
+Return metadata from `x` as a `Dict` where the keys are the metadata field names.
 
 # Examples
 ```jldoctest
@@ -418,27 +217,4 @@ Dict{String,Any} with 1 entry:
 """
 function metadata(x::SummarizedExperiment)
     return x.metadata;
-end
-
-"""
-    setmetadata!(x, value)
-
-Set metadata in `x` to `value`.
-
-# Examples
-```jldoctest
-julia> using SummarizedExperiments
-
-julia> x = exampleobject(20, 10);
-
-julia> setmetadata!(x, Dict{String,Any}("foo" => 200));
-
-julia> metadata(x)
-Dict{String,Any} with 1 entry:
-  "foo" => 200
-```
-"""
-function setmetadata!(x::SummarizedExperiment, value::Dict{String,Any})
-    x.metadata = value;
-    return
 end
