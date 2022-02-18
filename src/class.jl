@@ -95,8 +95,10 @@ mutable struct SummarizedExperiment
     julia> x = SummarizedExperiment(assays, nothing, coldata)
     2x3 SummarizedExperiment
       assays(2): foobar whee
-      rowdata(0):
-      coldata(1): Treatment
+      rownames:
+      rowdata(1): name
+      colnames: a b c
+      coldata(2): name treatment
       metadata(0):
     ```
     """

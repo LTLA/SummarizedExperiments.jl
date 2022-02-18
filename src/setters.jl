@@ -43,7 +43,7 @@ julia> replacement[!,"foobar"] = [ rand() for i in 1:size(x)[1] ];
 julia> setrowdata!(x, replacement);
 
 julia> names(rowdata(x))
-2-element Array{String,1}:
+3-element Vector{String}:
  "name"
  "Type"
  "foobar"
@@ -86,7 +86,7 @@ julia> replacement[!,"foobar"] = [ rand() for i in 1:size(x)[2] ];
 julia> setcoldata!(x, replacement);
 
 julia> names(coldata(x))
-4-element Array{String,1}:
+4-element Vector{String}:
  "name"
  "Treatment"
  "Response"
@@ -143,7 +143,8 @@ end
 
 function setassay!(x::SummarizedExperiment, i::Int64, value::AbstractArray)
     dim = size(value)
-    if dim[1] != x.nrow || dim[2] != x.ncol
+    xdim = size(x)
+    if dim[1] != xdim[1] || dim[2] != xdim[2]
         throw(DimensionMismatch("dimensions of 'value' should be the same as those of 'x'"))
     end
 
@@ -161,7 +162,8 @@ end
 
 function setassay!(x::SummarizedExperiment, i::String, value::AbstractArray)
     dim = size(value)
-    if dim[1] != x.nrow || dim[2] != x.ncol
+    xdim = size(x)
+    if dim[1] != xdim[1] || dim[2] != xdim[2]
         throw(DimensionMismatch("dimensions of 'value' should be the same as those of 'x'"))
     end
     x.assays[i] = value
@@ -194,9 +196,10 @@ julia> length(assays(x))
 ```
 """
 function setassays!(x::SummarizedExperiment, value::DataStructures.OrderedDict{String,AbstractArray})
+    xdim = size(x)
     for (name, val) in value
         dim = size(val)
-        if dim[1] != x.nrow || dim[2] != x.ncol
+        if dim[1] != xdim[1] || dim[2] != xdim[2]
             throw(DimensionMismatch("dimensions of 'value[" * repr(name) * "]' should be the same as those of 'x'"))
         end
     end
@@ -218,7 +221,7 @@ julia> x = exampleobject(20, 10);
 julia> setmetadata!(x, Dict{String,Any}("foo" => 200));
 
 julia> metadata(x)
-Dict{String,Any} with 1 entry:
+Dict{String, Any} with 1 entry:
   "foo" => 200
 ```
 """

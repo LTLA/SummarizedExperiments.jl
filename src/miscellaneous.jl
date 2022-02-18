@@ -11,20 +11,20 @@ julia> x = exampleobject(20, 10);
 
 julia> x2 = copy(x);
 
-julia> setrowdata!(x2, DataFrame());
+julia> setrowdata!(x2, nothing);
 
 julia> size(rowdata(x)) # Change to reference is only reflected in x2.
 (20, 2)
 
 julia> size(rowdata(x2))
-(0, 0)
+(20, 1)
 
-julia> insertcols!(coldata(x), 1, "WHEE" => 1:10); # Otherwise, references point to the same object.
+julia> insertcols!(coldata(x), 2, "WHEE" => 1:10); # Otherwise, references point to the same object.
 
 julia> names(coldata(x2))
-4-element Array{String,1}:
+4-element Vector{String}:
+ "name"
  "WHEE"
- "ID"
  "Treatment"
  "Response"
 ```
@@ -53,19 +53,19 @@ julia> x = exampleobject(20, 10);
 
 julia> x2 = deepcopy(x);
 
-julia> setrowdata!(x2, DataFrame());
+julia> setrowdata!(x2, nothing);
 
 julia> size(rowdata(x)) # Change to reference is only reflected in x2.
 (20, 2)
 
 julia> size(rowdata(x2))
-(0, 0)
+(20, 1)
 
-julia> insertcols!(coldata(x), 1, "WHEE" => 1:10); # References now point to different objects.
+julia> insertcols!(coldata(x), 2, "WHEE" => 1:10); # References now point to different objects.
 
 julia> names(coldata(x2))
-3-element Array{String,1}:
- "ID"
+3-element Vector{String}:
+ "name"
  "Treatment"
  "Response"
 ```

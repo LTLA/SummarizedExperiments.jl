@@ -64,8 +64,10 @@ julia> y = exampleobject(30, 10);
 julia> z = vcat(x, y)
 50x10 SummarizedExperiment
   assays(3): foo bar whee
-  rowdata(2): ID Type
-  coldata(3): ID Treatment Response
+  rownames: Gene1 Gene2 ... Gene29 Gene30
+  rowdata(2): name Type
+  colnames: Patient1 Patient2 ... Patient9 Patient10
+  coldata(3): name Treatment Response
   metadata(1): version
 ```
 """
@@ -140,8 +142,10 @@ julia> y = exampleobject(20, 30);
 julia> z = hcat(x, y)
 20x50 SummarizedExperiment
   assays(3): foo bar whee
-  rowdata(2): ID Type
-  coldata(3): ID Treatment Response
+  rownames: Gene1 Gene2 ... Gene19 Gene20
+  rowdata(2): name Type
+  colnames: Patient1 Patient2 ... Patient29 Patient30
+  coldata(3): name Treatment Response
   metadata(1): version
 ```
 """

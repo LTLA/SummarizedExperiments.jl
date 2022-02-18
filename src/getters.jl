@@ -1,4 +1,4 @@
-export size, rowdata, setrowdata!, coldata, setcoldata!, assay, setassay!, assays, setassays!, metadata, setmetadata!
+export size, rowdata, coldata, assay, assays, metadata
 import DataFrames
 import DataStructures
 
@@ -55,7 +55,7 @@ julia> using SummarizedExperiments
 julia> x = exampleobject(20, 10);
 
 julia> names(rowdata(x))
-2-element Array{String,1}:
+2-element Vector{String}:
  "name"
  "Type"
 
@@ -88,7 +88,7 @@ julia> using SummarizedExperiments
 julia> x = exampleobject(20, 10);
 
 julia> names(coldata(x))
-3-element Array{String,1}:
+3-element Vector{String}:
  "name"
  "Treatment"
  "Response"
@@ -131,7 +131,7 @@ julia> assay(x, "foo");
 ```
 """
 function assay(x::SummarizedExperiment; check = true)
-    return assay(x, 1, check)
+    return assay(x, 1; check = check)
 end
 
 function assay(x::SummarizedExperiment, i::Int64; check = true)
@@ -182,7 +182,7 @@ julia> using SummarizedExperiments
 julia> x = exampleobject(20, 10);
 
 julia> collect(keys(assays(x)))
-3-element Array{String,1}:
+3-element Vector{String}:
  "foo"
  "bar"
  "whee"
@@ -211,7 +211,7 @@ julia> using SummarizedExperiments
 julia> x = exampleobject(20, 10);
 
 julia> metadata(x)
-Dict{String,Any} with 1 entry:
+Dict{String, Any} with 1 entry:
   "version" => "1.1.0"
 ```
 """
