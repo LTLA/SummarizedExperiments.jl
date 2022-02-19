@@ -11,11 +11,7 @@ function check_dataframe_firstcol(x::DataFrames.DataFrame)
     return isa(first, AbstractVector{<:AbstractString}) || isa(first, Vector{Nothing})
 end
 
-function check_dataframe_in_constructor(x::DataFrames.DataFrame, expected::Int, message::String)
-    if size(x)[1] != expected 
-        throw(DimensionMismatch("unexpected number of rows for '" * message * "'"))
-    end
-
+function check_dataframe_in_constructor(x::DataFrames.DataFrame, message::String)
     if !check_dataframe_has_name(x)
         throw(ArgumentError("first column of '" * message * "' should be 'name'"))
     end
@@ -82,21 +78,16 @@ mutable struct SummarizedExperiment
     end
 
     @doc """
-        SummarizedExperiment(assays, rowdata=nothing, coldata=nothing, metadata=Dict{String,Any}())
+        SummarizedExperiment(assays)
 
-    Create an instance of a `SummarizedExperiment` with the supplied assays and the (optional) row/column annotations.
+    Create an instance of a `SummarizedExperiment` with the supplied assays.
 
     All entries of `assays` should have the same extents for the first two dimensions.
     However, they can otherwise have any number of other dimensions.
     Each assay can be of different type.
+    `assays` should contain at least one assay matrix.
 
-    If a `DataFrame` is supplied to `rowdata`, the number of rows must be equal to the extent of the first dimension for any entry in `assays`.
-    Similarly, for a `DataFrame` in `coldata`, the number of rows must be equal to the extnt of the second dimension.
-    The first column must be called `"name"` and contain a `Vector` of `String`s or `Nothing`s (if no names are available).
-    If `nothing` is supplied, an empty `DataFrame` is created with a `"name"` column containing all `nothing`s.
-
-    `assays` may be empty if `rowdata` and `coldata` are both non-`nothing`.
-    Otherwise an error will be raised as the dimensions of the `SummarizedExperiment` cannot be determined.
+    For the `coldata` and `rowdata`, an empty `DataFrame` is created with a `"name"` column containing all `nothing`s.
 
     # Examples
     ```jldoctest
@@ -108,39 +99,24 @@ mutable struct SummarizedExperiment
               "foobar" => [[1,2] [3,4] [5,6]], 
               "whee" => [[1.2,2.3] [3.4,4.5] [5.6,7.8]]);
 
-    julia> coldata = DataFrame(
-              name = [ "a", "b", "c" ],
-              treatment = ["normal", "drug1", "drug2"]);
-
-    julia> x = SummarizedExperiment(assays, nothing, coldata)
+    julia> x = SummarizedExperiment(assays)
     2x3 SummarizedExperiment
       assays(2): foobar whee
       rownames:
       rowdata(1): name
-      colnames: a b c
-      coldata(2): name treatment
+      colnames:
+      coldata(1): name
       metadata(0):
     ```
     """
-    function SummarizedExperiment(
-            assays::DataStructures.OrderedDict{String, AbstractArray},
-            rowdata::Union{DataFrames.DataFrame,Nothing} = nothing,
-            coldata::Union{DataFrames.DataFrame,Nothing} = nothing,
-            metadata::Dict{String,Any} = Dict{String,Any}()
-        )
-
-        refdims = (0, 0)
+    function SummarizedExperiment(assays::DataStructures.OrderedDict{String, AbstractArray})
         if length(assays) < 1
-            if rowdata == nothing || coldata == nothing
-                throw(ErrorException("expected at least one array in 'assays' if 'rowdata' or 'coldata' are not supplied"))
-            end
-            refdims = (size(rowdata)[1], size(coldata)[1])
-        else 
-            firstdims = size(first(assays).second)
-            if length(refdims) < 2 
-                throw(DimensionMismatch("'assays' should contain arrays with 2 or more dimensions"))
-            end
-            refdims = (firstdims[1], firstdims[2])
+            throw(ErrorException("expected at least one array in 'assays' if 'rowdata' or 'coldata' are not supplied"))
+        end
+
+        refdims = size(first(assays).second)
+        if length(refdims) < 2 
+            throw(DimensionMismatch("'assays' should contain arrays with 2 or more dimensions"))
         end
 
         first_name = first(assays).first
@@ -151,20 +127,71 @@ mutable struct SummarizedExperiment
             end
         end
 
-        nrow = refdims[1]
-        if isa(rowdata, Nothing)
-            rowdata = DataFrames.DataFrame(name = Vector{Nothing}(undef, nrow))
-        else
-            check_dataframe_in_constructor(rowdata, nrow, "rowdata")
+        rowdata = DataFrames.DataFrame(name = Vector{Nothing}(undef, refdims[1]))
+        coldata = DataFrames.DataFrame(name = Vector{Nothing}(undef, refdims[2]))
+        new(assays, rowdata, coldata, Dict{String,Any}())
+    end
+
+    @doc """
+        SummarizedExperiment(assays, rowdata, coldata, metadata = Dict{String,Any}())
+
+    Create an instance of a `SummarizedExperiment` with the supplied assays and the row/column annotations.
+
+    All entries of `assays` should have the same extents for the first two dimensions.
+    However, they can otherwise have any number of other dimensions.
+    Each assay can be of different type.
+
+    For `rowdata`, the number of rows must be equal to the extent of the first dimension for each entry in `assays`.
+    Similarly, for `coldata`, the number of rows must be equal to the extent of the second dimension.
+    In both cases, the first column must be called `"name"` and contain a `Vector` of `String`s or `Nothing`s (if no names are available).
+
+    `assays` may also be empty.
+
+    # Examples
+    ```jldoctest
+    julia> using SummarizedExperiments
+
+    julia> using DataFrames, DataStructures
+
+    julia> assays = OrderedDict{String, AbstractArray}(
+              "foobar" => [[1,2] [3,4] [5,6]], 
+              "whee" => [[1.2,2.3] [3.4,4.5] [5.6,7.8]]);
+
+    julia> rowdata = DataFrame(
+              name = [ "X", "Y" ],
+              type = ["protein", "transcript"]);
+
+    julia> coldata = DataFrame(
+              name = [ "a", "b", "c" ],
+              treatment = ["normal", "drug1", "drug2"]);
+
+    julia> x = SummarizedExperiment(assays, rowdata, coldata)
+    2x3 SummarizedExperiment
+      assays(2): foobar whee
+      rownames: X Y
+      rowdata(2): name type
+      colnames: a b c
+      coldata(2): name treatment
+      metadata(0):
+    ```
+    """
+    function SummarizedExperiment(
+            assays::DataStructures.OrderedDict{String, AbstractArray},
+            rowdata::DataFrames.DataFrame,
+            coldata::DataFrames.DataFrame,
+            metadata::Dict{String,Any} = Dict{String,Any}()
+        )
+
+        refdims = (size(rowdata)[1], size(coldata)[1])
+
+        for (key, val) in assays
+            if !check_assay_dimensions(size(val), refdims)
+                throw(DimensionMismatch("dimensions of 'assays[" * repr(key) * "]' are not consistent with 'rowdata' or 'coldata'"))
+            end
         end
 
-        ncol = refdims[2]
-        if isa(coldata, Nothing)
-            coldata = DataFrames.DataFrame(name = Vector{Nothing}(undef, ncol))
-        else
-            check_dataframe_in_constructor(coldata, ncol, "coldata")
-        end
-
+        check_dataframe_in_constructor(rowdata, "rowdata")
+        check_dataframe_in_constructor(coldata, "coldata")
         new(assays, rowdata, coldata, metadata)
     end
 end

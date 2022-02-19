@@ -75,10 +75,14 @@ SummarizedExperiment
 ```@docs
 SummarizedExperiment(
     assays::DataStructures.OrderedDict{String, AbstractArray},
-    rowdata::Union{Nothing, DataFrames.DataFrame} = nothing, 
-    coldata::Union{Nothing, DataFrames.DataFrame} = nothing, 
+    rowdata::DataFrames.DataFrame,
+    coldata::DataFrames.DataFrame, 
     metadata::Dict{String, Any} = Dict{String,Any}()
 )
+```
+
+```@docs
+SummarizedExperiment(assays::DataStructures.OrderedDict{String, AbstractArray})   
 ```
 
 ```@docs
