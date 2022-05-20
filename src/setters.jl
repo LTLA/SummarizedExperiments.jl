@@ -1,6 +1,6 @@
-export setrowdata!, setcoldata!, setassay!, setassays!, setmetadata!
-import DataFrames
-import DataStructures
+# export setrowdata!, setcoldata!, setassay!, setassays!, setmetadata!
+# import DataFrames
+# import DataStructures
 
 function check_dataframe_in_setter(value::DataFrames.DataFrame, expected::Int, message::String)
     if size(value)[1] != expected

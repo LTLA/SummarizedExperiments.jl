@@ -1,5 +1,5 @@
-import DataFrames
-import DataStructures
+# import DataFrames
+# import DataStructures
 
 function collapse_data(x::Vector{DataFrames.DataFrame})
     base = copy(x[1])

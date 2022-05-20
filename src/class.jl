@@ -1,6 +1,6 @@
-export SummarizedExperiment
-import DataFrames
-import DataStructures
+# export SummarizedExperiment
+# import DataFrames
+# import DataStructures
 
 function check_dataframe_has_name(x::DataFrames.DataFrame)
     return size(x)[2] >= 1 && names(x)[1] == "name"
