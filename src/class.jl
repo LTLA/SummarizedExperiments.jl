@@ -2,16 +2,16 @@
 # import DataFrames
 # import DataStructures
 
-function check_dataframe_has_name(x::DataFrames.DataFrame)
+function check_dataframe_has_name(x::DataFrame)
     return size(x)[2] >= 1 && names(x)[1] == "name"
 end
 
-function check_dataframe_firstcol(x::DataFrames.DataFrame)
+function check_dataframe_firstcol(x::DataFrame)
     first = x[!,1]
     return isa(first, AbstractVector{<:AbstractString}) || isa(first, Vector{Nothing})
 end
 
-function check_dataframe_in_constructor(x::DataFrames.DataFrame, message::String)
+function check_dataframe_in_constructor(x::DataFrame, message::String)
     if !check_dataframe_has_name(x)
         throw(ArgumentError("first column of '" * message * "' should be 'name'"))
     end
@@ -43,9 +43,9 @@ If no names are present, the `"name"` column must contain `nothing`s.
 Each instance may also contain arbitrary metadata not associated with the rows or columns.
 """
 mutable struct SummarizedExperiment
-    assays::DataStructures.OrderedDict{String,AbstractArray}
-    rowdata::DataFrames.DataFrame
-    coldata::DataFrames.DataFrame
+    assays::OrderedDict{String,AbstractArray}
+    rowdata::DataFrame
+    coldata::DataFrame
     metadata::Dict{String,Any}
 
     @doc """
@@ -68,9 +68,9 @@ mutable struct SummarizedExperiment
     ```
     """
     function SummarizedExperiment()
-        dummy = DataFrames.DataFrame(name = String[])
+        dummy = DataFrame(name = String[])
         new(
-           DataStructures.OrderedDict{String,AbstractArray}(), 
+           OrderedDict{String,AbstractArray}(), 
            dummy,
            deepcopy(dummy),
            Dict{String,Any}()
@@ -93,7 +93,7 @@ mutable struct SummarizedExperiment
     ```jldoctest
     julia> using SummarizedExperiments
 
-    julia> using DataFrames, DataStructures
+    julia> # using DataFrames, DataStructures
 
     julia> assays = OrderedDict{String, AbstractArray}(
               "foobar" => [[1,2] [3,4] [5,6]], 
@@ -109,7 +109,7 @@ mutable struct SummarizedExperiment
       metadata(0):
     ```
     """
-    function SummarizedExperiment(assays::DataStructures.OrderedDict{String, AbstractArray})
+    function SummarizedExperiment(assays::OrderedDict{String, AbstractArray})
         if length(assays) < 1
             throw(ErrorException("expected at least one array in 'assays' if 'rowdata' or 'coldata' are not supplied"))
         end
@@ -127,8 +127,8 @@ mutable struct SummarizedExperiment
             end
         end
 
-        rowdata = DataFrames.DataFrame(name = Vector{Nothing}(undef, refdims[1]))
-        coldata = DataFrames.DataFrame(name = Vector{Nothing}(undef, refdims[2]))
+        rowdata = DataFrame(name = Vector{Nothing}(undef, refdims[1]))
+        coldata = DataFrame(name = Vector{Nothing}(undef, refdims[2]))
         new(assays, rowdata, coldata, Dict{String,Any}())
     end
 
@@ -151,7 +151,7 @@ mutable struct SummarizedExperiment
     ```jldoctest
     julia> using SummarizedExperiments
 
-    julia> using DataFrames, DataStructures
+    julia> # using DataFrames, DataStructures
 
     julia> assays = OrderedDict{String, AbstractArray}(
               "foobar" => [[1,2] [3,4] [5,6]], 
@@ -176,9 +176,9 @@ mutable struct SummarizedExperiment
     ```
     """
     function SummarizedExperiment(
-            assays::DataStructures.OrderedDict{String, AbstractArray},
-            rowdata::DataFrames.DataFrame,
-            coldata::DataFrames.DataFrame,
+            assays::OrderedDict{String, AbstractArray},
+            rowdata::DataFrame,
+            coldata::DataFrame,
             metadata::Dict{String,Any} = Dict{String,Any}()
         )
 

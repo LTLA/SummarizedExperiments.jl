@@ -38,21 +38,21 @@ function exampleobject(nrow::Int64, ncol::Int64)
         third_assay[i] = -rand()
     end
 
-    assays = DataStructures.OrderedDict{String, AbstractArray}(
+    assays = OrderedDict{String, AbstractArray}(
         "foo" => first_assay, 
         "bar" => second_assay, 
         "whee" => third_assay
     )
 
     tchoices = ["normal", "drug1", "drug2"]
-    coldata = DataFrames.DataFrame(
+    coldata = DataFrame(
         "name" => [ "Patient" * string(i) for i in 1:ncol ],
         "Treatment" => [ tchoices[Int(floor(rand() * length(tchoices) + 1))] for i in 1:ncol ],
         "Response" => [ rand() for i in 1:ncol ]
     )
 
     gchoices = ["Protein-coding", "Pseudogene"]
-    rowdata = DataFrames.DataFrame(
+    rowdata = DataFrame(
         "name" => [ "Gene" * string(i) for i in 1:nrow ],
         "Type" => [ gchoices[Int(floor(rand() * length(gchoices) + 1))] for i in 1:nrow ]
     )
