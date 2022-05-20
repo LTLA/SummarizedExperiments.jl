@@ -1,7 +1,8 @@
 module SummarizedExperiments
 
-import DataStructures
-import DataFrames
+using Reexport
+@reexport using DataStructures: OrderedDict
+@reexport using DataFrames: DataFrame
 
 include("class.jl")
 export SummarizedExperiment
