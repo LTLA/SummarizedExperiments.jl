@@ -21,7 +21,7 @@ function Base.size(x::SummarizedExperiment)
     return (size(x.rowdata)[1], size(x.coldata)[1])
 end
 
-function check_dataframe_in_getter(value::DataFrames.DataFrame, expected::Int, message::String)
+function check_dataframe_in_getter(value::DataFrame, expected::Int, message::String)
     if expected != size(value)[1]
         @warn "'" * message * "(x)' has a different number of rows than 'x'"
         return

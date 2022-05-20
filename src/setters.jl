@@ -2,7 +2,7 @@
 # import DataFrames
 # import DataStructures
 
-function check_dataframe_in_setter(value::DataFrames.DataFrame, expected::Int, message::String)
+function check_dataframe_in_setter(value::DataFrame, expected::Int, message::String)
     if size(value)[1] != expected
         throw(DimensionMismatch("'value' and '" * message *"(x)' should have the same number of rows"))
     end
@@ -34,7 +34,7 @@ julia> using SummarizedExperiments
 
 julia> x = exampleobject(20, 10);
 
-julia> using DataFrames
+julia> # using DataFrames
 
 julia> replacement = copy(rowdata(x));
 
@@ -49,9 +49,9 @@ julia> names(rowdata(x))
  "foobar"
 ```
 """    
-function setrowdata!(x::SummarizedExperiment, value::Union{DataFrames.DataFrame,Nothing})
+function setrowdata!(x::SummarizedExperiment, value::Union{DataFrame,Nothing})
     if isa(value, Nothing)
-        x.rowdata = DataFrames.DataFrame(name = Vector{Nothing}(undef, size(x)[1]))
+        x.rowdata = DataFrame(name = Vector{Nothing}(undef, size(x)[1]))
     else
         check_dataframe_in_setter(value, size(x)[1], "rowdata")
         x.rowdata = value
@@ -77,7 +77,7 @@ julia> using SummarizedExperiments
 
 julia> x = exampleobject(20, 10);
 
-julia> using DataFrames
+julia> # using DataFrames
 
 julia> replacement = copy(coldata(x));
 
@@ -93,9 +93,9 @@ julia> names(coldata(x))
  "foobar"
 ```
 """
-function setcoldata!(x::SummarizedExperiment, value::Union{DataFrames.DataFrame,Nothing})
+function setcoldata!(x::SummarizedExperiment, value::Union{DataFrame,Nothing})
     if isa(value, Nothing)
-        x.coldata = DataFrames.DataFrame(name = Vector{Nothing}(undef, size(x)[2]))
+        x.coldata = DataFrame(name = Vector{Nothing}(undef, size(x)[2]))
     else
         check_dataframe_in_setter(value, size(x)[2], "coldata")
         x.coldata = value
@@ -195,7 +195,7 @@ julia> length(assays(x))
 2
 ```
 """
-function setassays!(x::SummarizedExperiment, value::DataStructures.OrderedDict{String,AbstractArray})
+function setassays!(x::SummarizedExperiment, value::OrderedDict{String,AbstractArray})
     xdim = size(x)
     for (name, val) in value
         dim = size(val)

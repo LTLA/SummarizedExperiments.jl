@@ -1,7 +1,7 @@
 # import DataFrames
 # import DataStructures
 
-function collapse_data(x::Vector{DataFrames.DataFrame})
+function collapse_data(x::Vector{DataFrame})
     base = copy(x[1])
     refnames = Set(names(base))
 
@@ -79,7 +79,7 @@ function Base.vcat(A::Vararg{SummarizedExperiment})
     collected_rowdata = [rowdata(A[1])];
     collected_coldata = [coldata(A[1])];
     collected_metadata = [metadata(A[1])];
-    collected_assays = DataStructures.OrderedDict{String,Vector{AbstractArray}}();
+    collected_assays = OrderedDict{String,Vector{AbstractArray}}();
     for (key, val) in assays(A[1])
         collected_assays[key] = AbstractArray[val]
     end
@@ -103,7 +103,7 @@ function Base.vcat(A::Vararg{SummarizedExperiment})
     end
 
     full_rowdata = vcat(collected_rowdata...)
-    full_assays = DataStructures.OrderedDict{String,AbstractArray}()
+    full_assays = OrderedDict{String,AbstractArray}()
     for (key, val) in collected_assays
         full_assays[key] = vcat(val...)
     end
@@ -157,7 +157,7 @@ function Base.hcat(A::Vararg{SummarizedExperiment})
     collected_rowdata = [rowdata(A[1])];
     collected_coldata = [coldata(A[1])];
     collected_metadata = [metadata(A[1])];
-    collected_assays = DataStructures.OrderedDict{String,Vector{AbstractArray}}();
+    collected_assays = OrderedDict{String,Vector{AbstractArray}}();
     for (key, val) in assays(A[1])
         collected_assays[key] = AbstractArray[val]
     end
@@ -181,7 +181,7 @@ function Base.hcat(A::Vararg{SummarizedExperiment})
     end
 
     full_coldata = vcat(collected_coldata...)
-    full_assays = DataStructures.OrderedDict{String,AbstractArray}()
+    full_assays = OrderedDict{String,AbstractArray}()
     for (key, val) in collected_assays
         full_assays[key] = hcat(val...)
     end

@@ -5,7 +5,7 @@ Return a copy of `x`, where all components are identically-same as those in `x`.
 
 # Examples
 ```jldoctest
-julia> using SummarizedExperiments, DataFrames
+julia> using SummarizedExperiments # , DataFrames
 
 julia> x = exampleobject(20, 10);
 
@@ -47,7 +47,7 @@ Return a deep copy of `x` and all of its components.
 
 # Examples
 ```jldoctest
-julia> using SummarizedExperiments, DataFrames
+julia> using SummarizedExperiments # , DataFrames
 
 julia> x = exampleobject(20, 10);
 
