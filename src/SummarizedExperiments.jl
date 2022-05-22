@@ -2,7 +2,7 @@ module SummarizedExperiments
 
 using Reexport
 @reexport using DataStructures: OrderedDict
-@reexport using DataFrames: DataFrame
+@reexport using DataFrames: DataFrame, insertcols!
 
 include("class.jl")
 export SummarizedExperiment
