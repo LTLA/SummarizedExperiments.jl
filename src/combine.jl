@@ -1,6 +1,3 @@
-# import DataFrames
-# import DataStructures
-
 function collapse_data(x::Vector{DataFrame})
     base = copy(x[1])
     refnames = Set(names(base))

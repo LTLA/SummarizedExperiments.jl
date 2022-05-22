@@ -1,7 +1,3 @@
-# import DataStructures
-# import DataFrames
-# export exampleobject
-
 """
     exampleobject(nrow, ncol)
 

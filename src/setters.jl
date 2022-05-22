@@ -1,7 +1,3 @@
-# export setrowdata!, setcoldata!, setassay!, setassays!, setmetadata!
-# import DataFrames
-# import DataStructures
-
 function check_dataframe_in_setter(value::DataFrame, expected::Int, message::String)
     if size(value)[1] != expected
         throw(DimensionMismatch("'value' and '" * message *"(x)' should have the same number of rows"))
@@ -76,8 +72,6 @@ The return value is a reference to the modified `x`.
 julia> using SummarizedExperiments
 
 julia> x = exampleobject(20, 10);
-
-julia> # using DataFrames
 
 julia> replacement = copy(coldata(x));
 

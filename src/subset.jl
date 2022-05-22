@@ -1,5 +1,3 @@
-# import DataStructures
-
 Base.IndexStyle(x::SummarizedExperiment) = IndexCartesian()
 
 """

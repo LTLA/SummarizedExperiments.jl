@@ -1,7 +1,3 @@
-# export SummarizedExperiment
-# import DataFrames
-# import DataStructures
-
 function check_dataframe_has_name(x::DataFrame)
     return size(x)[2] >= 1 && names(x)[1] == "name"
 end
@@ -93,8 +89,6 @@ mutable struct SummarizedExperiment
     ```jldoctest
     julia> using SummarizedExperiments
 
-    julia> # using DataFrames, DataStructures
-
     julia> assays = OrderedDict{String, AbstractArray}(
               "foobar" => [[1,2] [3,4] [5,6]], 
               "whee" => [[1.2,2.3] [3.4,4.5] [5.6,7.8]]);
@@ -150,8 +144,6 @@ mutable struct SummarizedExperiment
     # Examples
     ```jldoctest
     julia> using SummarizedExperiments
-
-    julia> # using DataFrames, DataStructures
 
     julia> assays = OrderedDict{String, AbstractArray}(
               "foobar" => [[1,2] [3,4] [5,6]], 

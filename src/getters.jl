@@ -1,7 +1,3 @@
-# export size, rowdata, coldata, assay, assays, metadata
-# import DataFrames
-# import DataStructures
-
 """
     size(x::SummarizedExperiment)
 
