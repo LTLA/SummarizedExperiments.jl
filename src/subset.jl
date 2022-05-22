@@ -1,5 +1,3 @@
-import DataStructures
-
 Base.IndexStyle(x::SummarizedExperiment) = IndexCartesian()
 
 """
@@ -68,7 +66,7 @@ function Base.getindex(x::SummarizedExperiment, i, j)
     new_rowdata = x.rowdata[index_rows,:]
     new_coldata = x.coldata[index_cols,:]
 
-    new_assays = DataStructures.OrderedDict{String,AbstractArray}();
+    new_assays = OrderedDict{String,AbstractArray}();
     for (key, val) in x.assays
         subdex = Array{Any,1}(undef, length(size(val)))
         fill!(subdex, :)

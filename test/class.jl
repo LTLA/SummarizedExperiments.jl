@@ -10,7 +10,6 @@
         @test length(x.metadata) == 0
     end
 
-    using DataStructures
     assays = OrderedDict{String, AbstractArray}(
        "foobar" => [[1,2] [3,4] [5,6]], 
        "whee" => [[1.2,2.3] [3.4,4.5] [5.6,7.8]])
@@ -24,8 +23,6 @@
         @test size(x.coldata) == (3, 1)
         @test length(x.metadata) == 0
     end
-
-    using DataFrames
 
     rowdata = DataFrame(name = ["Gene1", "Gene2"],
                         Features = ["Feat1", "Feat2"])
